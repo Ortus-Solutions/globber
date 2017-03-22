@@ -1,5 +1,7 @@
 ﻿# Globber
 
+[![Build Status](https://travis-ci.org/Ortus-Solutions/globber.svg?branch=master)](https://travis-ci.org/Ortus-Solutions/globber)
+
 I am a utility to match file system path patterns (globbing) in the same manner as Unix file systems.
 
 End a pattern with a slash to only match a directory. Start a pattern with a slash to start in the root. Ex:
