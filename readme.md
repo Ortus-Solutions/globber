@@ -50,7 +50,7 @@ A question mark matches a single non-slash character
 
 This transient represents a single globbing pattern and provide a fluent API to access the matching files.  Unlike the PathPatternMatcher, which only handles comparisons of patterns, this model actually interacts with the file system to resolve a pattern to a list of real file system resources.
 
-Returns an array of all text files recursivley below the `myFolder` directory whos name end with `bar`.
+Returns an array of all text files recursively below the `myFolder` directory whose name end with `bar`.
 ```
 var results = wirebox.getInstance( 'globber' )
 	.setPattern( 'C:/myFolder/**/*bar.txt' )
