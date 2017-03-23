@@ -129,11 +129,11 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             	// Search the entire globber repo (around 600 files)
             	
 				fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', baseDir & chr(10) );
-				fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', expandPath( baseDir & '../../../../' ) & chr(10) );
-				fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', expandPath( baseDir & '../../../../' ) & '**/foo.txt' & chr(10) );
+				fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', expandPath( baseDir & '/../../../../' ) & chr(10) );
+				fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', expandPath( baseDir & '/../../../../' ) & '**/foo.txt' & chr(10) );
 				
             	var results = globber
-            		.setPattern( expandPath( baseDir & '../../../../' ) & '**/foo.txt' )
+            		.setPattern( expandPath( baseDir & '/../../../../' ) & '**/foo.txt' )
             		.matches();
             	
             	expect( results ).toHaveLength( 1 );
