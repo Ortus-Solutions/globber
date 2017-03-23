@@ -127,9 +127,9 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 			
             it( "Do a deep search", function() {
             	// Search the entire globber repo (around 600 files)
-            				
+            	
             	var results = globber
-            		.setPattern( expandPath( baseDir & '/../../../../' ) & '**/foo.txt' )
+            		.setPattern( expandPath( baseDir & '/../../../' ) & '**/foo.txt' )
             		.matches();
             	
             	expect( results ).toHaveLength( 1 );
