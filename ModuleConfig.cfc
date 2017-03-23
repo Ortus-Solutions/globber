@@ -5,6 +5,6 @@ component {
     this.webUrl = "https://github.com//globber";
 
     function configure() {
-        //
+        binder.map( 'globber' ).toDSL( 'globber@globber' );
     }
 }
