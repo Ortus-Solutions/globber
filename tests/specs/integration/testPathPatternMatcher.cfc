@@ -186,6 +186,10 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 				assertTrue( PathPatternMatcher.matchPattern( '/a/**', 'a/b/' ) );
 				assertTrue( PathPatternMatcher.matchPattern( '/a/**', 'a/b/c/d/' ) );
 				assertTrue( PathPatternMatcher.matchPattern( '**/foo', 'foo/' ) );
+				
+				assertTrue( PathPatternMatcher.matchPattern( '/**/a*.txt', 'foo/bar/anvil.txt' ) );
+				assertFalse( PathPatternMatcher.matchPattern( '/**/a*.txt', 'foo/bar/trap.txt' ) );
+				
 				assertTrue( PathPatternMatcher.matchPattern( '**/foo/bar', 'foo/bar/' ) );
 				assertTrue( PathPatternMatcher.matchPattern( '**/foo/bar', 'a/b/foo/bar/' ) );
 				
@@ -216,6 +220,14 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 				assertFalse( PathPatternMatcher.matchPattern( '/b', 'a/b/c/d' ) );
 				assertTrue( PathPatternMatcher.matchPattern( '/a\b', 'a/b/c\d' ) );
 				assertFalse( PathPatternMatcher.matchPattern( '/d', 'a\b\c\d' ) );
+				
+            } );
+            
+            
+            it( "question mark matches single non-slash char", function() {
+				assertTrue( PathPatternMatcher.matchPattern( '/h?t', 'hat' ) );
+				assertFalse( PathPatternMatcher.matchPattern( '/h?t', 'ham' ) );
+				assertFalse( PathPatternMatcher.matchPattern( '/h?t', 'h/t' ) );
 				
             } );
             

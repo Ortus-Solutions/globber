@@ -1,6 +1,6 @@
 ﻿[![Build Status](https://travis-ci.org/Ortus-Solutions/globber.svg?branch=master)](https://travis-ci.org/Ortus-Solutions/globber)
 
-I am a utility to match file system path patterns (globbing) in the same manner as Unix file systems.
+I am a utility to match file system path patterns (globbing) in a similar manner as Unix file systems or `.gitignore` syntax.
 
 ## Installation
 
@@ -50,14 +50,14 @@ A question mark matches a single non-slash character
 
 This transient represents a single globbing pattern and provide a fluent API to access the matching files.  Unlike the PathPatternMatcher, which only handles comparisons of patterns, this model actually interacts with the file system to resolve a pattern to a list of real file system resources.
 
-Finds any text files recursivley below the `myFolder` directory whos name end with `bar`.
+Returns an array of all text files recursivley below the `myFolder` directory whos name end with `bar`.
 ```
 var results = wirebox.getInstance( 'globber' )
 	.setPattern( 'C:/myFolder/**/*bar.txt' )
 	matches();
 ```
 
-Apply a closure to a markdown files in a directory.
+Apply a closure to all markdown files in a directory.
 ```
 wirebox.getInstance( 'globber' )
 	.setPattern( 'C:/myFolder/*.md' )
