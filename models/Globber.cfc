@@ -88,6 +88,10 @@ component accessors="true" {
 			}
 			baseDir = baseDir.listAppend( token, '/' );
 		}
+		// Unix paths need the leading slash put back
+		if( thisPattern.startsWith( '/' ) ) {
+			baseDir = '/' & baseDir;
+		}
 		
 		if( !baseDir.len() ) {
 			baseDir = '/';
