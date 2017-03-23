@@ -86,10 +86,11 @@ component accessors="true" singleton {
 		
 	//	writeDump(regex);
 	//	writeDump(arguments.path);
-	systemOutput( 'regex: #regex#', true );
-	systemOutput( 'path: #arguments.path#', true );
-	systemOutput( '', true );
-	systemOutput( '', true );
+		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', 'regex: #regex##chr(10)#' );
+		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', 'path: #arguments.path##chr(10)#' );
+		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', chr(10) );
+		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', chr(10) );
+		
 		return ( reFindNoCase( regex, arguments.path ) > 0 );
 	}
 

@@ -19,7 +19,8 @@ install:
 before_script:
 - box server start cfengine=$ENGINE port=8500
 script:
+- touch /home/travis/build/Ortus-Solutions/globber/log.txt
 - box testbox run runner='http://127.0.0.1:8500/tests/runner.cfm'
-- box server log
+- cat /home/travis/build/Ortus-Solutions/globber/log.txt
 notifications:
   email: false
