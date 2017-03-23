@@ -57,7 +57,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 	    	
             it( "Can match a file in a sub dir", function() {
             	var results = globber
-            		.setPattern( baseDir & '**/luis.txt' )
+            		.setPattern( baseDir & '/**/luis.txt' )
             		.matches();
             		
             	expect( results ).toHaveLength( 1 );
@@ -127,6 +127,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 			
             it( "Do a deep search", function() {
             	// Search the entire globber repo (around 600 files)
+            	writeDump(expandPath( baseDir & '../../../../' ) & '**/foo.txt');
             	var results = globber
             		.setPattern( expandPath( baseDir & '../../../../' ) & '**/foo.txt' )
             		.matches();
