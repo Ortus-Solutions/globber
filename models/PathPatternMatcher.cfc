@@ -84,13 +84,8 @@ component accessors="true" singleton {
 			regex &= '.*';	
 		}
 		
-	//	writeDump(regex);
-	//	writeDump(arguments.path);
-		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', 'regex: #regex##chr(10)#' );
-		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', 'path: #arguments.path##chr(10)#' );
-		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', chr(10) );
-		fileAppend( '/home/travis/build/Ortus-Solutions/globber/log.txt', chr(10) );
-		
+		//	writeDump(regex);
+		//	writeDump(arguments.path);		
 		return ( reFindNoCase( regex, arguments.path ) > 0 );
 	}
 
