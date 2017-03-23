@@ -86,6 +86,10 @@ component accessors="true" singleton {
 		
 	//	writeDump(regex);
 	//	writeDump(arguments.path);
+	systemOutput( 'regex: #regex#', true );
+	systemOutput( 'path: #arguments.path#', true );
+	systemOutput( '', true );
+	systemOutput( '', true );
 		return ( reFindNoCase( regex, arguments.path ) > 0 );
 	}
 
