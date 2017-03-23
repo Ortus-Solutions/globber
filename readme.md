@@ -54,14 +54,14 @@ Returns an array of all text files recursively below the `myFolder` directory wh
 ```
 var results = wirebox.getInstance( 'globber' )
 	.setPattern( 'C:/myFolder/**/*bar.txt' )
-	matches();
+	.matches();
 ```
 
 Apply a closure to all markdown files in a directory.
 ```
 wirebox.getInstance( 'globber' )
 	.setPattern( 'C:/myFolder/*.md' )
-	apply( function( path ) {
+	.apply( function( path ) {
 		fileDelete( path );
 	} );
 ```
