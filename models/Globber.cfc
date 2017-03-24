@@ -93,6 +93,11 @@ component accessors="true" {
 			baseDir = '/' & baseDir;
 		}
 		
+		// Windows drive letters need trailing slash.
+		if( baseDir.listLen( '/' ) == 1 && baseDir contains ':' ) {
+			baseDir = baseDir & '/';
+		}
+		
 		if( !baseDir.len() ) {
 			baseDir = '/';
 		}
