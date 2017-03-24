@@ -23,6 +23,8 @@ component accessors="true" {
 	property name='format' default='array';
 	/** Sort to use */
 	property name='sort' default='type, name';
+	/** Directory the list was pulled from */
+	property name='baseDir' default='';
 	
 
 	function init() {
@@ -149,6 +151,7 @@ component accessors="true" {
 				sort=getSort()
 			)
 		);
+		setBaseDir( baseDir );
 		
 	}
 
