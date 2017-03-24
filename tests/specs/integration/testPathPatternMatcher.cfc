@@ -8,7 +8,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 	
     function run() {
     	
-        xdescribe( "Integration Specs", function() {
+        describe( "Integration Specs", function() {
         	
             it( "can run integration specs with the module activated", function() {
                 expect( getController().getModuleService().isModuleRegistered( "globber" ) ).toBeTrue();
@@ -16,7 +16,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             
         } );
     	
-        xdescribe( "Path pattern matcher", function() {
+        describe( "Path pattern matcher", function() {
         	
             it( "foo will match any file or folder in the directory tree", function() {
             	
