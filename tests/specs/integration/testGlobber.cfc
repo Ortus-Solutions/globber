@@ -33,6 +33,22 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             	expect( results ).toHaveLength( 23 );
 			} );
 	    	
+            it( "Can get count of matches", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/**' )
+            		.count();
+            		
+            	expect( results ).toBe( 23 );
+			} );
+	    	
+            it( "Can get count of NO matches", function() {
+            	var results = globber
+            		.setPattern( baseDir & 'sdfsdfasdf' )
+            		.count();
+            		
+            	expect( results ).toBe( 0 );
+			} );
+	    	
             it( "Can match extensions in current dir", function() {
             	var results = globber
             		.setPattern( baseDir & '/*.txt' )
