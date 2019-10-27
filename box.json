@@ -25,7 +25,7 @@
     "scripts":{
         "postVersion":"package set location='Ortus-Solutions/globber#v`package version`'",
         "onRelease":"forgebox use ortus && publish",
-        "postPublish":"!git push && !git push --tags"
+        "postPublish":"!git push --follow-tags"
     },
     "ignore":[
         "**/.*",
