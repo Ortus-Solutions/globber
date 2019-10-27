@@ -218,13 +218,16 @@ component accessors="true" {
 		}
 		
 		if( patterns.len() > 1 ) {
-			var dirs = valueArray( getMatchQuery(), 'directory' );			
+			var dirs = valueArray( getMatchQuery(), 'directory' );						
 			var lookups = {};
 			dirs.each( function( dir ) {
-				// Account for *nix paths
-				var prefix = dir.startsWith( '/' ) ? '/' : '';
-				// Account for Windows UNC network shares
-				prefix = dir.startsWith( '\\' ) ? '\\' : '';
+				// Account for *nix paths & Windows UNC network shares
+				var prefix = '';
+				if( dir.startsWith( '/' ) ) {
+					prefix = '/';
+				} else if( dir.startsWith( '\\' ) ) {
+					prefix = '//';
+				}
 				evaluate( 'lookups["#prefix##dir.listChangeDelims( '"]["', '/\' )#"]={}' );
 			} );
 			var findRoot = function( lookups ){
@@ -234,7 +237,8 @@ component accessors="true" {
 					return '';
 				}
 			}
-			setBaseDir( findRoot( lookups ) );			
+			writeDump(findRoot( lookups ));abort;
+			setBaseDir( findRoot( lookups ) );
 		}
 		
 	}
