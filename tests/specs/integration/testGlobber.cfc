@@ -3,7 +3,8 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 	function setup() {
 		super.setup();
 		baseDir = expandPath( '/tests/resources/testFolders' );
-	//	applicationStop();
+		baseDir = getInstance( 'PathPatternMatcher@globber' ).normalizeSlashes( baseDir );
+	//	applicationStop(); 
 	}
 	
     function run() {
@@ -207,8 +208,121 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/bar.txt' ) );
             	            	
 			} );
+			
+            it( "Can accept array of patterns", function() {
+            	var results = globber
+            		.setPattern( [ baseDir & '/names/*', baseDir & '/states/*' ] )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 6 );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/brad.txt' ) );
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );
+            	            	
+			} );
+			
+            it( "Can accept list of patterns", function() {
+            	var results = globber
+            		.setPattern( "#baseDir#/names/*,#baseDir#/states/*" )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 6 );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/brad.txt' ) );
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );
+            	            	
+			} );
+			
+            it( "Can remove duplicate matches", function() {
+            	var results = globber
+            		.setPattern( "#baseDir#/names/*,#baseDir#/names/*" )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 3 );
+            	            	
+			} );
+			
+            it( "Can ignore empty patterns", function() {
+            	var results = globber
+            		.setPattern( [ "#baseDir#/names/*", '', '', '' ] )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 3 );
+            	            	
+			} );
+			
+            it( "Doesn't allow no patterns", function() {
+            	expect( function() {
+            		globber.matches();
+            	} ).toThrow( regex='Cannot glob empty pattern' );            	            	
+			} );
+			
+            it( "Can add pattern to existing list", function() {
+            	var results = globber
+            		.addPattern( baseDir & '/names/*' )
+            		.addPattern( baseDir & '/states/*' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 6 );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/brad.txt' ) );
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );            	            	
+			} );
+			
+            it( "calculates the base dir", function() {
+            	var glob = globber
+            		.setPattern( [ baseDir & '/names/*', baseDir & '/states/*', baseDir & '/food' ] );
+            		
+           		glob.matches();          		
+            	            		
+            	expect( glob.getBaseDir() ).toBe( baseDir&'/' );
+            	
+            } );
+        
+			it( "Can exclude a single path", function() {
+				var results = globber
+					.setPattern( baseDir & '/names/**' )
+					.setExcludePattern( baseDir & '/names/brad.txt' )
+						.matches()
+						.map( function( i ) { return expandPath( i ); } );
+				
+				expect( results ).toHaveLength( 2 );
+			} );
+        
+			it( "Can exclude a folder", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.setExcludePattern( baseDir & '/names/**' )
+						.matches()
+						.map( function( i ) { return expandPath( i ); } );
+
+				expect( results ).toHaveLength( 19 );
+			} );
+        
+			it( "Can exclude an array", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.setExcludePattern( [ baseDir & '/names/**', baseDir & '/food/**' ] )
+						.matches()
+						.map( function( i ) { return expandPath( i ); } );
+
+				expect( results ).toHaveLength( 7 );
+			} );
+        
+			it( "Can add single excludes", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.addExcludePattern( baseDir & '/names/**' )
+						.matches()
+						.map( function( i ) { return expandPath( i ); } );
+
+				expect( results ).toHaveLength( 19 );
+			} );
 		
         } );
+
         
     }
 }
