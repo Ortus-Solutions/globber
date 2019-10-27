@@ -218,7 +218,7 @@ component accessors="true" {
 		}
 		
 		if( patterns.len() > 1 ) {
-			var dirs = valueArray( getMatchQuery(), 'directory' );						
+			var dirs = queryColumnData( getMatchQuery(), 'directory' );						
 			var lookups = {};
 			dirs.each( function( dir ) {
 				// Account for *nix paths & Windows UNC network shares
@@ -237,7 +237,6 @@ component accessors="true" {
 					return '';
 				}
 			}
-			writeDump(findRoot( lookups ));abort;
 			setBaseDir( findRoot( lookups ) );
 		}
 		
