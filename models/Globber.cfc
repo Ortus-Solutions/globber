@@ -67,12 +67,13 @@ component accessors="true" {
 	*/
 	function setPattern( required any pattern ) {
 		if( isSimpleValue( arguments.pattern ) ) {
-			arguments.pattern = listToArray( arguments.pattern ).map( function( p ) {
-				return pathPatternMatcher.normalizeSlashes( arguments.p );
-			}).filter( function( p ){
-				return len( arguments.p );
-			} );
+			arguments.pattern = listToArray( arguments.pattern );
 		}
+		arguments.pattern = arguments.pattern.map( function( p ) {
+			return pathPatternMatcher.normalizeSlashes( arguments.p );
+		}).filter( function( p ){
+			return len( arguments.p );
+		} );
 		variables.pattern = arguments.pattern;
 		return this;
 	}
@@ -108,12 +109,13 @@ component accessors="true" {
 	*/
 	function setExcludePattern( required any excludePattern ) {
 		if( isSimpleValue( arguments.excludePattern ) ) {
-			arguments.excludePattern = listToArray( arguments.excludePattern ).map( function( p ) {
-				return pathPatternMatcher.normalizeSlashes( arguments.p );
-			}).filter( function( p ){
-				return len( arguments.p );
-			} );
+			arguments.excludePattern = listToArray( arguments.excludePattern );
 		}
+		arguments.excludePattern = arguments.excludePattern.map( function( p ) {
+			return pathPatternMatcher.normalizeSlashes( arguments.p );
+		}).filter( function( p ){
+			return len( arguments.p );
+		} );
 		variables.excludePattern = arguments.excludePattern;
 		return this;
 	}
@@ -209,7 +211,7 @@ component accessors="true" {
 				cfquery( dbtype="query" ,name="local.newMatchQuery" ) {
 					writeOutput( 'SELECT DISTINCT * FROM newMatchQuery ' );
 					if( len( getSort() ) ) {
-						writeOutput( 'ORDER BY #getSort()#' );
+						writeOutput( 'ORDER BY #getCleanSort()#' );
 					}
 				}
 				
@@ -298,5 +300,29 @@ component accessors="true" {
 		
 	}
 	
+	/**
+	* The sort function in CFDirectory will simply ignore invalid sort columns so I'm mimicing that here, as much as I dislike it.
+	* The sort should be in the format of "col asc, col2 desc, col3, col4" like a SQL order by
+	* If any of the coluns or sort directions don't look right, just bail and return the default sort. 
+	*/
+	function getCleanSort() {
+		// Loop over each sort item
+		for( var item in listToArray( getSort() ) ) {
+			// Validate column name
+			if( !listFindNoCase( 'name,directory,size,type,dateLastModified,attributes,mode', trim( item.listFirst( ' 	' ) ) ) ) {
+				return 'type, name';
+			}
+			// Validate sort direction
+			if( item.listLen( ' 	' ) == 2 && !listFindNoCase( 'asc,desc', trim( item.listLast( ' 	' ) ) ) ) {
+				return 'type, name';
+			}
+			// Ensure no more than 2 tokens 
+			if( item.listLen( ' 	' ) > 2 ) {
+				return 'type, name';
+			}
+		}
+		// Ok, everything passes.
+		return getSort();
+	}
 
 }

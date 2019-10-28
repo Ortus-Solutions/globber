@@ -320,6 +320,34 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
 				expect( results ).toHaveLength( 19 );
 			} );
+        
+			it( "Can ignore invalid sorts", function() {
+				globber
+					.setSort( 'name asc' );
+				expect( globber.getCleanSort() ).toBe( 'name asc' );
+				
+				globber
+					.setSort( 'name asc, directory desc' );
+				expect( globber.getCleanSort() ).toBe( 'name asc, directory desc' );
+				
+				globber
+					.setSort( ' name , directory ' );
+				expect( globber.getCleanSort() ).toBe( ' name , directory ' );
+				
+				globber
+					.setSort( 'name desk' );
+				expect( globber.getCleanSort() ).toBe( 'type, name' );
+				
+				globber
+					.setSort( 'name asc foo' );
+				expect( globber.getCleanSort() ).toBe( 'type, name' );
+				
+				globber
+					.setSort( 'bean desc' );
+				expect( globber.getCleanSort() ).toBe( 'type, name' );
+				
+				
+			} );
 		
         } );
 
