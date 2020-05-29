@@ -32,6 +32,13 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 				assertTrue( PathPatternMatcher.matchPattern( 'b', 'a/b/c/d' ) );
 				assertTrue( PathPatternMatcher.matchPattern( 'c', 'a/b/c/d' ) );
 				assertTrue( PathPatternMatcher.matchPattern( 'd', 'a/b/c/d' ) );
+				assertFalse( PathPatternMatcher.matchPattern( 'foo', 'a/b/c/foobar' ) );
+				assertFalse( PathPatternMatcher.matchPattern( 'foo', 'a/foobar/b/c' ) );
+				assertFalse( PathPatternMatcher.matchPattern( 'bar', 'a/b/c/foobar' ) );
+				assertFalse( PathPatternMatcher.matchPattern( 'bar', 'a/foobar/b/c' ) );
+				assertTrue( PathPatternMatcher.matchPattern( 'foobar', 'foobar/b/c' ) );
+				assertTrue( PathPatternMatcher.matchPattern( 'foobar', 'a/b/foobar' ) );
+				assertTrue( PathPatternMatcher.matchPattern( 'foobar', 'a/foobar/b/c' ) );
 				
             } );
             
