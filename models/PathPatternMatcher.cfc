@@ -36,7 +36,7 @@ component accessors="true" singleton {
 	* Match a single path to a single pattern.  Returns true if the path matches the pattern, otherwise false.
 	* The "exact" param is because Globber has different use cases. For example, when used for things like ignore lists
 	* a pattern not preceded by a slash should match directories and files recursibley, any level deep.  But when used for a 
-	* directory listing, it's expected to use **/pattern/** to match deep folder.
+	* directory listing, it's expected to use ** /pattern/ ** to match deep folder.
 	* A pattern like foo must also match the entire file or folder name, not a partial name unless explicitly passed as *foo, foo*, or *foo*
 	* 
 	* @pattern The pattern to match against the path
