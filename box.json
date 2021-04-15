@@ -7,7 +7,7 @@
     "documentation":"https://github.com/Ortus-Solutions/globber/",
     "repository":{
         "type":"Git",
-        "URL":"git@github.com:Ortus-Solutions/globber.git"
+        "URL":"https://github.com/Ortus-Solutions/globber"
     },
     "bugs":"https://github.com/Ortus-Solutions/globber/issues",
     "slug":"globber",
