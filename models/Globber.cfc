@@ -61,7 +61,7 @@ component accessors="true" {
 	}
 
 	/**
-	* Override setter to ensure consistent slashe in pattern
+	* Override setter to ensure consistent slashes in pattern
 	* Can be list of patterns or array of patterns.
 	* Empty patterns will be ignored
 	*/
@@ -79,7 +79,7 @@ component accessors="true" {
 	}
 
 	/**
-	* Add addiional pattern to process
+	* Add additional pattern to process
 	*/
 	function addPattern( required string pattern ) {
 		if( len( arguments.pattern ) ) {
@@ -121,7 +121,7 @@ component accessors="true" {
 	}
 
 	/**
-	* Add addiional excludePattern to process
+	* Add additional excludePattern to process
 	*/
 	function addExcludePattern( required string excludePattern ) {
 		if( len( arguments.excludePattern ) ) {
@@ -197,9 +197,9 @@ component accessors="true" {
 		for( var thisPattern in patterns ) {
 			processPattern( thisPattern );
 		}
-		
+
 		var matchQuery = getMatchQuery();
-		
+
 		if( isNull( matchQuery ) ) {
 			setMatchQuery( queryNew( 'name,size,type,dateLastModified,attributes,mode,directory' ) );
 		} else {
@@ -210,8 +210,8 @@ component accessors="true" {
 					writeOutput( 'ORDER BY #getCleanSort()#' );
 				}
 			}
-	
-			setMatchQuery( local.newMatchQuery );			
+
+			setMatchQuery( local.newMatchQuery );
 		}
 
 
@@ -239,7 +239,7 @@ component accessors="true" {
 		}
 
 	}
-	
+
 	function appendMatchQuery( matchQuery ) {
 		// First one in just gets set
 		if( isNull( getMatchQuery() ) ) {
@@ -257,7 +257,7 @@ component accessors="true" {
 	}
 
 	private function processPattern( string pattern ) {
-		
+
 		local.thisPattern = pathPatternMatcher.normalizeSlashes( arguments.pattern );
 
 		// To optimize this as much as possible, we want to get a directory listing as deep as possible so we process a few files as we can.
@@ -285,12 +285,12 @@ component accessors="true" {
 		if( !baseDir.len() ) {
 			baseDir = '/';
 		}
-		
+
 		var everythingAfterBaseDir = thisPattern.replace( baseDir, '' );
-		
+
 		// If we have a partial directory next such as modules* optimize here
 		if( everythingAfterBaseDir.listLen( '/' ) > 1 && everythingAfterBaseDir.listFirst( '/' ).reFind( '[^\*^\?]' ) && !everythingAfterBaseDir.listFirst( '/' ).startsWith( '**' ) ) {
-						
+
 			thisPattern = baseDir & '/' & everythingAfterBaseDir.listFirst( '/' ) & '/';
 			// Manually loop over the dirs at this level that match to narrow what we're looking at
 			directoryList (
@@ -307,7 +307,7 @@ component accessors="true" {
 					return false;
 				}
 			).each( ( folder )=>processPattern( baseDir & '/' & folder.name & '/' & everythingAfterBaseDir.listRest( '/' ) ) )
-			
+
 			return;
 		}
 
@@ -320,7 +320,7 @@ component accessors="true" {
 		if( reFind( '\.[a-zA-Z0-9\?\*]{2,4}$', thisPattern ) ) {
 			optimizeFilter = '*.' & thisPattern.listLast( '.' ).replace( '?', '*', 'all' );
 		}
-		
+
 		var dl = directoryList (
 				listInfo='query',
 				recurse=local.recurse,
@@ -328,7 +328,11 @@ component accessors="true" {
 				sort=getSort(),
 				filter=optimizeFilter
 			).filter( ( path )=>{
-				var thisPath = path.directory & '/' & path.name & ( path.type == 'dir' ? '/' : '' );
+				if( path.directory.endsWith( '/' ) || path.directory.endsWith( '\' ) ) {
+					var thisPath = path.directory & path.name & ( path.type == 'dir' ? '/' : '' );
+				} else {
+					var thisPath = path.directory & '/' & path.name & ( path.type == 'dir' ? '/' : '' );
+				}
 				if( pathPatternMatcher.matchPattern( thisPattern, thisPath, true ) ) {
 					if( getExcludePatternArray().len() && pathPatternMatcher.matchPatterns( getExcludePatternArray(), thisPath, true ) ) {
 						return false;
@@ -337,16 +341,16 @@ component accessors="true" {
 				}
 				return false;
 			} );
-		
+
 		appendMatchQuery( dl );
 		setBaseDir( baseDir & ( baseDir.endsWith( '/' ) ? '' : '/' ) );
 
 	}
 
 	/**
-	* The sort function in CFDirectory will simply ignore invalid sort columns so I'm mimicing that here, as much as I dislike it.
+	* The sort function in CFDirectory will simply ignore invalid sort columns so I'm mimicking that here, as much as I dislike it.
 	* The sort should be in the format of "col asc, col2 desc, col3, col4" like a SQL order by
-	* If any of the coluns or sort directions don't look right, just bail and return the default sort.
+	* If any of the columns or sort directions don't look right, just bail and return the default sort.
 	*/
 	function getCleanSort() {
 		// Loop over each sort item
