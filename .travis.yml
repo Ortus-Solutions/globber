@@ -1,10 +1,9 @@
 language: java
 sudo: required
 jdk:
-- oraclejdk8
+- openjdk11
 env:
   matrix:
-    - ENGINE=lucee@4.5
     - ENGINE=lucee@5
    # - ENGINE=adobe@2016
    # - ENGINE=adobe@11
