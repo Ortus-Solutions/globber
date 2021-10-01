@@ -4,7 +4,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 		super.setup();
 		baseDir = expandPath( '/tests/resources/testFolders' );
 		baseDir = getInstance( 'PathPatternMatcher@globber' ).normalizeSlashes( baseDir );
-	//	applicationStop(); 
+		//applicationStop(); 
 	}
 	
     function run() {
@@ -15,14 +15,91 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 				globber = getInstance( 'globber' );
 	    	} );
 	    	
+            it( "process negative ignore", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/food' )
+            		.setExcludePattern( '/food/unhealthy/*,!/food/unhealthy/arsenic.txt,!/food/unhealthy/lard.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+        		
+            	expect( results ).toHaveLength( 11 );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/milk.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/veggies.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/arsenic.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/lard.txt' ) );
+			} );
+	    	
+            it( "process negative ignore in deep dir", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '#baseDir#/**' )
+            		.setExcludePattern( '#baseDir#/*,!#baseDir#/food/unhealthy/arsenic.t?t,!#baseDir#/food/unhealthy/lard.txt,!#baseDir#/foo.txt' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	            	
+            	expect( results ).toHaveLength( 3 );
+            	expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/arsenic.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/lard.txt' ) );
+			} );
+	    	
+            it( "process negative loose ignore in deep dir", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '*' )
+            		.setExcludePattern( '*,!/food/unhealthy/arsenic.t?t,!/food/unhealthy/lard.txt,!foo.txt,!/bar.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	            	
+            	expect( results ).toHaveLength( 4 );
+            	expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/bar.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/arsenic.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/lard.txt' ) );
+			} );
+	    	
             it( "Can match a specific path", function() {
             	var results = globber
-            		.setPattern( baseDir )
+            		.setPattern( baseDir & '/foo.txt' )
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
             	
             	expect( results ).toHaveLength( 1 );
-            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/' ) );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/foo.txt' ) );
+			} );
+	    	
+            it( "Can loose match a specific path", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( 'foo.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	
+            	expect( results ).toHaveLength( 1 );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/foo.txt' ) );
+			} );
+	    	
+            it( "Can loose match a specific exact path", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/foo.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	
+            	expect( results ).toHaveLength( 1 );
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/foo.txt' ) );
 			} );
 	    	
             it( "Can match all sub paths", function() {
@@ -57,7 +134,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             		
             	expect( results ).toHaveLength( 3 );
-            	// Expand path makes slashes match local file system 
+            	
             	expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/bar.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/baz.txt' ) );
@@ -70,21 +147,90 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             		
             	expect( results ).toHaveLength( 2 );
-            	// Expand path makes slashes match local file system 
+            	
             	expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/' ) );
             	
 			} );
 	    	
-            it( "Can match a file in a sub dir", function() {
+            it( "Can match a file in a sub dir recursivley", function() {
             	var results = globber
             		.setPattern( baseDir & '/**/luis.txt' )
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
-            		
             	expect( results ).toHaveLength( 1 );
-            	// Expand path makes slashes match local file system 
+            	
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/luis.txt' ) );
+            	
+			} );
+			
+	    	
+            it( "Can match a file in a sub dir", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/*/luis.txt' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	expect( results ).toHaveLength( 1 );
+            	
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/luis.txt' ) );
+            	
+			} );
+	    	
+            it( "Can match a deep file with loose matching", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( 'luis.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	expect( results ).toHaveLength( 1 );
+            	
+            	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/luis.txt' ) );
+            	
+			} );
+	    	
+            it( "leading slash in loose mode only matches root - no results", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/luis.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	expect( results ).toHaveLength( 0 );
+            	
+			} );
+	    	
+            it( "leading slash in loose mode only matches root", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/nam?s' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 4 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/names/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/brad.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/gavin.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/luis.txt' ) );
+            	
+			} );
+	    	
+            it( "leading slash in loose mode only matches root with exclusion", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/nam?s' )
+            		.setExcludePattern( 'brad.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+
+            	expect( results ).toHaveLength( 3 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/names/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/gavin.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/luis.txt' ) );
             	
 			} );
 			
@@ -95,12 +241,113 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             			
             	expect( results ).toHaveLength( 5 );
-            	// Expand path makes slashes match local file system 
+            	
             	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/' ) );
+            	
+			} );
+						
+            it( "Can match all files in a deep dir with loose exclude", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( '/food' )
+            		.setExcludePattern( 'fruits.txt,unhealthy,coffee.txt' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            			
+            	expect( results ).toHaveLength( 6 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/milk.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/veggies.txt' ) );
+            	
+			} );
+			
+            it( "Can match all files in a dir with loose matching", function() {
+            	var results = globber
+            		.inDirectory( baseDir )
+            		.setPattern( 'food' )
+            		.loose()
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 12 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/milk.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/veggies.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/arsenic.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/lard.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/unhealthy/candy.txt' ) );
+            	
+			} );
+			
+            it( "Can match all files in a deep dir with partial name", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/*d/*.txt' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 3 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+            	
+			} );
+			
+            it( "Can match files in a deep dir with question mark in the name", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/foo?/*.txt' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 3 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+            	
+			} );
+			
+            it( "Can have more than one wildcard in path", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/*/hea?thy/**' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            	expect( results ).toHaveLength( 4 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/milk.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/veggies.txt' ) );
+            	
+			} );
+			
+            it( "Can have double ** in middle of path", function() {
+            	var results = globber
+            		.setPattern( baseDir & '/**/hea?thy/*' )
+            		.matches()
+            		.map( function( i ) { return expandPath( i ); } );
+            		
+            	expect( results ).toHaveLength( 3 );
+            	
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/milk.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/food/healthy/veggies.txt' ) );
             	
 			} );
 			
@@ -111,7 +358,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             	
             	expect( results ).toHaveLength( 11 );
-            	// Expand path makes slashes match local file system 
+            	
             	expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
@@ -133,7 +380,6 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             	
             	expect( results ).toHaveLength( 1 );
-            	// Expand path makes slashes match local file system 
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/foo.txt' ) );
             	
 			} );
@@ -146,8 +392,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             			results.append( path );
             		} );
             	
-            	expect( results ).toHaveLength( 23 );
-            	
+            	expect( results ).toHaveLength( 23 );            	
 			} );
 			
             it( "Do a deep search", function() {
@@ -155,8 +400,9 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             	
             	var results = globber
             		.setPattern( expandPath( baseDir & '/../../../' ) & '**/foo.txt' )
+            		.setExcludePattern( [ expandPath( baseDir & '/../app/' ) & '**', expandPath( baseDir & '/../../../testbox/' ), expandPath( baseDir & '/../../../.git/' ) ] )
             		.matches();
-            	
+
             	expect( results ).toHaveLength( 1 );
 			} );
 			
@@ -181,8 +427,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             			results.append( row.name );
             		} );
             	
-            	expect( results ).toHaveLength( 23 );
-            	
+            	expect( results ).toHaveLength( 23 );            	
 			} );
 			
             it( "Can sort results asc", function() {
@@ -193,8 +438,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             		
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/bar.txt' ) );
-            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/' ) );
-            	            	
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/' ) );            	            	
 			} );
 			
             it( "Can sort results desc", function() {
@@ -205,8 +449,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.map( function( i ) { return expandPath( i ); } );
             		
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/states/' ) );
-            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/bar.txt' ) );
-            	            	
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/bar.txt' ) );            	            	
 			} );
 			
             it( "Can accept array of patterns", function() {
@@ -214,11 +457,10 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.setPattern( [ baseDir & '/names/*', baseDir & '/states/*' ] )
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
-            		
+
             	expect( results ).toHaveLength( 6 );
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/brad.txt' ) );
-            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );
-            	            	
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );            	            	
 			} );
 			
             it( "Can accept list of patterns", function() {
@@ -229,8 +471,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		
             	expect( results ).toHaveLength( 6 );
             	expect( results[ 1 ] ).toBe( expandPath( baseDir & '/names/brad.txt' ) );
-            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );
-            	            	
+            	expect( results[ 6 ] ).toBe( expandPath( baseDir & '/states/texas.txt' ) );            	            	
 			} );
 			
             it( "Can remove duplicate matches", function() {
@@ -239,8 +480,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
             		
-            	expect( results ).toHaveLength( 3 );
-            	            	
+            	expect( results ).toHaveLength( 3 );            	            	
 			} );
 			
             it( "Can ignore empty patterns", function() {
@@ -249,8 +489,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
             		
-            	expect( results ).toHaveLength( 3 );
-            	            	
+            	expect( results ).toHaveLength( 3 );            	            	
 			} );
 			
             it( "Doesn't allow no patterns", function() {
@@ -277,8 +516,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		
            		glob.matches();          		
             	            		
-            	expect( glob.getBaseDir() ).toBe( baseDir&'/' );
-            	
+            	expect( glob.getBaseDir() ).toBe( baseDir&'/' );            	
             } );
         
 			it( "Can exclude a single path", function() {
@@ -289,14 +527,16 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 						.map( function( i ) { return expandPath( i ); } );
 				
 				expect( results ).toHaveLength( 2 );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/gavin.txt' ) );
+            	expect( results ).toInclude( expandPath( baseDir & '/names/luis.txt' ) );
 			} );
         
 			it( "Can exclude a folder", function() {
 				var results = globber
 					.setPattern( baseDir & '/**' )
 					.setExcludePattern( baseDir & '/names/**' )
-						.matches()
-						.map( function( i ) { return expandPath( i ); } );
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
 
 				expect( results ).toHaveLength( 19 );
 			} );
@@ -348,9 +588,44 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 				
 				
 			} );
+						
+            it( "Can matching paths", function() {
+            	toPath = expandPath( '/tests/resources/tmpFolder' );
+            	if( directoryExists( toPath ) ) {
+            		directoryDelete( toPath, true )
+            	}
+            	try {
+	            	var results = globber
+	            		.inDirectory( baseDir & '/food' )
+	            		.loose()
+	            		.copyTo( toPath );
+	            		
+	            	var results = directoryList( toPath, true );
+					
+	            	expect( results ).toHaveLength( 11 );
+	            	
+	            	expect( results ).toInclude( expandPath( toPath & '/cake.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/coffee.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/pizza.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/healthy' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/healthy/fruits.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/healthy/milk.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/healthy/veggies.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/unhealthy' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/unhealthy/arsenic.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/unhealthy/lard.txt' ) );
+	            	expect( results ).toInclude( expandPath( toPath & '/unhealthy/candy.txt' ) );
+	            	
+            	} finally {
+	            	if( directoryExists( toPath ) ) {
+	            		directoryDelete( toPath, true )
+	            	}	
+            	}
+            	
+            	
+			} );
 		
         } );
-
         
     }
 }
