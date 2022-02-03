@@ -344,12 +344,9 @@ component accessors="true" {
 			}
 		}
 
-
 		// Strip off the "not found" part
 		var remainingPattern = findUnmatchedPattern( thisPattern, baseDir )
-		//echo( 'baseDir: ' & baseDir & '<br>' );
-		//echo( 'fileFilter: ' & fileFilter & '<br>' );
-		
+
 		var dl = directoryList (
 				listInfo='query',
 				recurse=false,
@@ -369,20 +366,12 @@ component accessors="true" {
 					pathToMatch = local.thisPath.replaceNoCase( getBaseDir(), '' );
 				}
 								
-				//dump( 'baseDir: ' & baseDir );
-				//dump( 'thisPattern: ' & thisPattern );
-				//dump( 'remainingPattern: ' & remainingPattern );
-				//dump( 'thisPath: ' & thisPath );
-				//dump( 'pathToMatch: ' & pathToMatch );
-				
 				// If we've hit an exclude pattern, we can bail now-- skipping all recursion and processing of files at this level.
 				var thisExcludePattern = this.getExcludePatternArray();
 				if( !skipExcludes && thisExcludePattern.len() && pathPatternMatcher.matchPatterns( thisExcludePattern, pathToMatch, !getLoose() ) ) {
 					// UNLESS we have a negated ignore!
 					var possiblePatterns = pathMayNotBeExcluded( pathToMatch, path.type, baseDir );
 					if( possiblePatterns.len() ) {
-						//dump('possiblePatterns');  
-						//dump(possiblePatterns);
 						// If we're looking at a file, just check it.  No need to recurse.
 						if(  path.type == 'file' ) {
 							if( pathPatternMatcher.matchPatterns( possiblePatterns, pathToMatch, !getLoose() ) ) {
@@ -413,11 +402,9 @@ component accessors="true" {
 							}
 						}
 					}
-					//dump( '#pathToMatch# EXCLUDED!' );
 					return false;
 				}
 				
-				//dump( '----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------' );
 				// If we're inside a **, then we just blindly recurse forever
 				if( arguments.path.type == 'dir' && remainingPattern.startsWith( '**' ) ) {
 					processPattern( thisPattern, local.thisPath, skipExcludes )
@@ -444,8 +431,6 @@ component accessors="true" {
 				}
 				return false;
 			} );
-			
-			//dump( dl );
 
 		appendMatchQuery( dl );
 		if( !getLoose() ) {

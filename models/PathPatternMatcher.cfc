@@ -118,11 +118,7 @@ component accessors="true" singleton {
 				regex &= '($|/.*)';	
 			}
 		}
-		
-			//if( path.endsWith( 'unhealthy/' ) ) {
-				//writeDump(regex & ' in ' & arguments.path & ' = ' & reFindNoCase( regex, arguments.path ) );
-				//abort;
-			//}
+
 		return ( reFindNoCase( regex, arguments.path ) > 0 );
 	}
 
