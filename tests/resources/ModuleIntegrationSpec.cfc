@@ -5,7 +5,7 @@ component extends="coldbox.system.testing.BaseTestCase" {
     */
     function registerModuleUnderTest() {
         getController().getModuleService()
-            .registerAndActivateModule( "globber", "testingModuleRoot" );
+            .registerAndActivateModule( "globber", "/testingModuleRoot" );
     }
 
     /**

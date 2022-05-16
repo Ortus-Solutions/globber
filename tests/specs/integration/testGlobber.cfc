@@ -60,7 +60,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             		.loose()
             		.matches()
             		.map( function( i ) { return expandPath( i ); } );
-            	            	
+
             	expect( results ).toHaveLength( 4 );
             	expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
             	expect( results ).toInclude( expandPath( baseDir & '/bar.txt' ) );
