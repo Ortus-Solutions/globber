@@ -14,8 +14,8 @@
     "type":"modules",
     "dependencies":{},
     "devDependencies":{
-        "testbox":"^4.4.0-snapshot",
-        "coldbox":"^4.3.0+188"
+        "testbox":"stable",
+        "coldbox":"stable"
     },
     "installPaths":{
         "coldbox":"tests/resources/app/coldbox/",

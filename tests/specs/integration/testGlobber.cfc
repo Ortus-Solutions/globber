@@ -656,6 +656,86 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
 			} );
 
+			it( "Defaults to unlimited depth", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
+
+				expect( results ).toHaveLength( 23 );
+			} );
+
+			it( "Can limit recursion to a specific depth", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.withDepth( 1 )
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
+
+				// Depth 1 is just the immediate children of the base dir.
+				expect( results ).toHaveLength( 6 );
+
+				expect( results ).toInclude( expandPath( baseDir & '/bar.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/baz.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/food/' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/names/' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/states/' ) );
+
+				// Nothing below the first level should be returned.
+				expect( results ).notToInclude( expandPath( baseDir & '/food/cake.txt' ) );
+				expect( results ).notToInclude( expandPath( baseDir & '/food/healthy/' ) );
+				expect( results ).notToInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+			} );
+
+			it( "A depth of zero returns nothing", function() {
+				var results = globber
+					.setPattern( baseDir & '/**' )
+					.withDepth( 0 )
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
+
+				expect( results ).toHaveLength( 0 );
+			} );
+
+			it( "Can limit depth with loose matching", function() {
+				var results = globber
+					.inDirectory( baseDir )
+					.setPattern( '*.txt' )
+					.loose()
+					.withDepth( 1 )
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
+
+				// Depth 1 is only the immediate children, so only the .txt
+				// files directly in baseDir match.
+				expect( results ).toHaveLength( 3 );
+
+				expect( results ).toInclude( expandPath( baseDir & '/foo.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/bar.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/baz.txt' ) );
+
+				// Anything in a sub dir should be excluded.
+				expect( results ).notToInclude( expandPath( baseDir & '/food/cake.txt' ) );
+				expect( results ).notToInclude( expandPath( baseDir & '/food/healthy/fruits.txt' ) );
+				expect( results ).notToInclude( expandPath( baseDir & '/food/unhealthy/candy.txt' ) );
+			} );
+
+			it( "Doesn't break explicitly nested patterns", function() {
+				var results = globber
+					.setPattern( baseDir & '/foo?/*.txt' )
+					.withDepth( 2 )
+					.matches()
+					.map( function( i ) { return expandPath( i ); } );
+
+				// A literal pattern like this already only matches one level deep,
+				// so the depth limit shouldn't interfere with it.
+				expect( results ).toHaveLength( 3 );
+				expect( results ).toInclude( expandPath( baseDir & '/food/cake.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/food/coffee.txt' ) );
+				expect( results ).toInclude( expandPath( baseDir & '/food/pizza.txt' ) );
+			} );
+
         } );
 
     }
