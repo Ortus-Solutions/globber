@@ -307,7 +307,25 @@ component accessors="true" {
 				} else if( dir.startsWith( '\\' ) ) {
 					prefix = '//';
 				}
-				evaluate( 'lookups["#prefix##dir.listChangeDelims( '"]["', '/\' )#"]={}' );
+				// Build the nested lookup struct one path segment at a time.
+				// This replicates what the old evaluate() call did, minus eval:
+				// walk (and auto-create) each intermediate segment, then always
+				// reset the leaf segment to an empty struct.
+				var segments = dir.listToArray( '/\' ).filter( ( s )=>len( s ) );
+				if( len( prefix ) && segments.len() ) {
+					segments[ 1 ] = prefix & segments[ 1 ];
+				}
+				var thisLookup = lookups;
+				var segmentCount = segments.len();
+				for( var i=1; i <= segmentCount; i++ ) {
+					var segment = segments[ i ];
+					if( i == segmentCount ) {
+						thisLookup[ segment ] = {};
+					} else if( !thisLookup.keyExists( segment ) ) {
+						thisLookup[ segment ] = {};
+					}
+					thisLookup = thisLookup[ segment ];
+				}
 			} );
 			var findRoot = function( lookups ){
 				if( lookups.count() == 1 ) {
